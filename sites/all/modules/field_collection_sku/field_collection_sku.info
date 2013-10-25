@@ -1,0 +1,5 @@
+name = Field Collection Sku
+core = 7.x
+package = Other
+dependencies[] = field_collection
+

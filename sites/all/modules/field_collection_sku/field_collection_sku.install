@@ -1,0 +1,16 @@
+<?php
+
+/**
+ * Implements hook_install().
+ */
+function field_collection_sku_install() {
+
+}
+
+
+/**
+ * Implements hook_uninstall().
+ */
+function field_collection_sku_uninstall() {
+
+}

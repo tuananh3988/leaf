@@ -1,0 +1,23 @@
+<?php
+function field_collection_sku_form_alter(&$form, $form_state, $entityform) {
+  if('consignor_entry_entityform_edit_form' == $entityform) {
+    array_unshift($form['#validate'], 'field_collection_sku_gennegel_number_validate');
+    array_unshift($form['actions']['submit']['#submit'], 'field_collection_sku_gennegel_number_submit');
+  }
+}
+
+function field_collection_sku_gennegel_number_submit($form, &$form_state) {
+  $values = &$form_state['values'];
+  if(isset($values['field_item'])) {
+    foreach ($values['field_item']['und'] as $key => $value) {
+      if(isset($value['field_sku'])) {
+        $form_state['values']['field_item']['und'][$key]['entity']->field_sku['und'][0]['value'] = 1355;
+      }
+    }
+  }
+  
+}
+
+function field_collection_sku_gennegel_number_validate($form, &$form_state) {
+  form_set_value($form['field_item']['und'][0]['field_sku'], array('und' => array(0 => array('value' => 'WORKS'))), $form_state);
+}
