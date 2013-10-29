@@ -14,3 +14,28 @@ function field_collection_sku_install() {
 function field_collection_sku_uninstall() {
 
 }
+
+
+/**
+ * Implements hook_schema().
+ */
+function field_collection_sku_schema() {
+  /**
+   * Instagram media objects have the following attributes:
+
+   */
+  $schema['consignor_entry_sku'] = array(
+    'description' => "Stores individual Instagrams (media).",
+    'fields' => array(
+      'sku' => array(
+        'description' => "Unique identifier for each {sku} number.",
+        'type' => 'int',
+        'not null' => TRUE,
+      ),
+    ),
+    'primary key' => array('sku'),
+  );
+
+
+  return $schema;
+}

@@ -1,9 +1,29 @@
 <?php
 function field_collection_sku_form_alter(&$form, $form_state, $entityform) {
+  
   if('consignor_entry_entityform_edit_form' == $entityform) {
-    array_unshift($form['#validate'], 'field_collection_sku_gennegel_number_validate');
-    array_unshift($form['actions']['submit']['#submit'], 'field_collection_sku_gennegel_number_submit');
+    foreach ($form['field_item']['und'] as $key => $value) {
+      if(is_numeric($key)) {
+        $form['field_item']['und'][$key]['field_sku']['#disabled'] = TRUE;
+      }
+    }
+   
+    //array_unshift($form['#validate'], 'field_collection_sku_gennegel_number_validate');
+    if(isset($form['actions']['submit']['#submit'])) {
+      array_unshift($form['actions']['submit']['#submit'], 'field_collection_sku_gennegel_number_submit');
+    }
+    
+    if(isset($form['actions']['save']['#submit'])) {
+      array_unshift($form['actions']['save']['#submit'], 'field_collection_sku_gennegel_number_submit');
+    }
+    
   }
+  
+  //hook field_collection_item_form
+  if('field_collection_item_form' == $entityform) {
+    $form['field_sku']['#disabled'] = TRUE;
+  }
+  
 }
 
 function field_collection_sku_gennegel_number_submit($form, &$form_state) {
@@ -11,7 +31,26 @@ function field_collection_sku_gennegel_number_submit($form, &$form_state) {
   if(isset($values['field_item'])) {
     foreach ($values['field_item']['und'] as $key => $value) {
       if(isset($value['field_sku'])) {
-        $form_state['values']['field_item']['und'][$key]['entity']->field_sku['und'][0]['value'] = 1355;
+        $validate = TRUE;
+        if(!isset($form_state['values']['field_item']['und'][$key]['entity']->field_sku['und'][0]['value'])) {
+          while ($validate) {
+            $sku = number_format(substr(time() * rand(),0,9),0,'','');
+            $result = db_select('consignor_entry_sku', 'c')
+              ->fields('c')
+              ->condition('sku', $sku,'=')
+              ->execute()
+              ->fetchAssoc();
+            if(!$result) {
+              $validate = FALSE;
+            }
+          }
+          db_insert('consignor_entry_sku')
+            ->fields(array(
+              'sku' => $sku
+            ))
+            ->execute();
+          $form_state['values']['field_item']['und'][$key]['entity']->field_sku['und'][0]['value'] = $sku;
+        }
       }
     }
   }
